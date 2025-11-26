@@ -1,8 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-// 路由模式
-const history = createWebHashHistory()
-
 // 路由映射关系 (后期，只需要向其中添加路由映射关系即可)
 const routes = [
     {
@@ -14,6 +11,9 @@ const routes = [
         component: () => import("@/views/home/index.vue"),
     },
 ]
+
+// 路由模式
+const history = createWebHashHistory()
 
 // 创建路由
 const router = createRouter({
