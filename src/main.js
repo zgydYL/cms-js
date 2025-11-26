@@ -5,6 +5,8 @@ import App from './App.vue'
 import "normalize.css";
 // 导入 自定义样式【尽可能直接导入多个css样式，避免@import性能问题】
 import "./assets/css/index.css";
+// 导入 element-plus
+import 'element-plus/dist/index.css'
 
 // 导入路由
 import router from "./router/index";

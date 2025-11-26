@@ -1,18 +1,21 @@
 <template>
   <div class="homePage">
     <h1>homePage</h1>
-    <el-button>Default</el-button>
-    <el-button type="primary">Primary</el-button>
-    <el-button type="success">Success</el-button>
-    <el-button type="info">Info</el-button>
-    <el-button type="warning">Warning</el-button>
-    <el-button type="danger">Danger</el-button>
+    <el-button @click="btnClick">Default</el-button>
   </div>
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
 
-
+const btnClick = () => {
+  ElMessage({
+    message: `This is a message`,
+    type: 'success',
+    placement: 'top',
+    plain: true,
+  })
+}
 
 </script>
 
