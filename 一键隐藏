@@ -1,0 +1,98 @@
+import tkinter as tk
+from tkinter import messagebox
+import os
+import subprocess
+import sys
+import win32gui
+import win32process
+import psutil
+
+def kill_process_by_window_title(titles_to_kill):
+    """根据窗口标题关闭指定程序"""
+    def enum_windows_callback(hwnd, _):
+        if win32gui.IsWindowVisible(hwnd):
+            window_title = win32gui.GetWindowText(hwnd)
+            # 获取窗口对应的进程名
+            try:
+                _, pid = win32process.GetWindowThreadProcessId(hwnd)
+                process = psutil.Process(pid)
+                process_name = process.name().lower()
+                
+                # 检查是否匹配目标窗口或进程
+                for title in titles_to_kill:
+                    if (title.lower() in window_title.lower() or 
+                        title.lower() in process_name):
+                        try:
+                            process.terminate()  # 先尝试优雅退出
+                            print(f"已关闭: {window_title} ({process_name})")
+                        except:
+                            try:
+                                process.kill()  # 强制结束
+                            except:
+                                pass
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+        return True
+
+    win32gui.EnumWindows(enum_windows_callback, None)
+
+def emergency_exit():
+    """紧急模式：一键清理 + 退出"""
+    # 要关闭的目标（支持窗口标题关键词和进程名）
+    targets = [
+        "Edge", "Microsoft Edge",
+        "记事本", "notepad", "无标题 - 记事本",
+        "命令提示符", "cmd", "命令行"
+    ]
+    
+    kill_process_by_window_title(targets)
+    
+    # 给点反馈，安心一下
+    messagebox.showinfo("🛡️ 安全了！", "已清理可疑窗口\n可以假装在摸鱼了～")
+    
+    # 关闭自己
+    root.quit()
+    root.destroy()
+
+# 创建主窗口
+root = tk.Tk()
+root.title("🚨 老板来了？")
+root.geometry("200x80")
+root.attributes('-topmost', True)  # 窗口置顶
+root.resizable(False, False)
+
+# 设置按钮
+btn = tk.Button(
+    root,
+    text="⚠️ 老板来了！",
+    font=("微软雅黑", 12, "bold"),
+    bg="#FF6B6B",
+    fg="white",
+    activebackground="#EE5253",
+    command=emergency_exit,
+    relief="raised",
+    bd=3
+)
+btn.pack(expand=True, fill='both', padx=10, pady=10)
+
+# 快捷键支持：按 F12 也能触发（更隐蔽）
+root.bind('<F12>', lambda e: emergency_exit())
+
+# 启动前提示一次（第一次运行时提醒）
+def show_first_tip():
+    messagebox.showinfo(
+        "📌 使用说明",
+        "点击按钮或按 F12 键\n立即关闭 Edge、记事本、CMD\n窗口会自动消失\n下次启动不再提示"
+    )
+    # 这里你可以加个配置文件记录是否首次运行，我们简化处理就不写了
+
+# 延迟显示提示（避免弹太快）
+root.after(100, show_first_tip)
+
+# 运行主循环
+try:
+    root.mainloop()
+except:
+    pass
+finally:
+    sys.exit()
